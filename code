@@ -1,0 +1,64 @@
+from wsgiref.simple_server import make_server       #make a server
+import falcon
+import json
+from mongoengine import connect
+from mongoengine.document import Document
+from mongoengine import Document, StringField #EmailField, IntField
+connect(db="mongoengine", host="localhost", port=27017)
+'''user = User(email="jerinjose61@gmail.com",         #it's a manual data entry
+            first_name="Jerin",
+            last_name="Jose",
+            age=28)'''
+
+#user.save()               #save the manual data
+
+
+
+
+class User(Document):                  #create model
+    name = StringField(required=True)
+class Abc():                             #api class
+
+    def on_get(self, req, resp):
+        """Handles GET requests"""
+        resp.status = falcon.HTTP_200  
+        resp.content_type = falcon.MEDIA_JSON
+        l=[]
+        for y in User.objects:
+            l.append(y.name)
+
+            print(y.name)
+           
+          
+    
+            
+        resp.media={
+            'name':l
+        }
+    def on_post(self, req, resp):
+
+         """Handles post requests"""
+         resp.status = falcon.HTTP_200  
+         resp.content_type = falcon.MEDIA_JSON
+         x=(req.media.get('name'))
+         User(name =x ).save()
+         
+         resp.media = {"result" : "done"}
+         
+         
+         
+        
+app = falcon.App()
+
+
+appi = Abc()
+
+
+app.add_route('/Abc', Abc)
+
+if __name__ == '__main__':
+    with make_server('', 8000, app) as httpd:
+        print('Serving on port 8000...')
+
+        
+        httpd.serve_forever()
